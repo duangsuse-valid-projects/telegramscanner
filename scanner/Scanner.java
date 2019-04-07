@@ -3,6 +3,9 @@ package org.duangsuse.telegramscanner.scanner;
 import org.duangsuse.telegramscanner.Main;
 import org.duangsuse.telegramscanner.helper.Strings;
 import org.duangsuse.telegramscanner.model.*;
+import org.duangsuse.telegramscanner.sourcemanager.Identifiable;
+import org.duangsuse.telegramscanner.sourcemanager.SourceLocation;
+import org.duangsuse.telegramscanner.sourcemanager.SourceManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -81,6 +84,7 @@ public class Scanner extends Utf8LineInputStream implements Iterable<Message<Str
                         //now message header is in lastLine
 
                         // set tgName and tgHeader
+                        if (lastLine == null) return null; // bad practice
                         Matcher m = RegexConstants.MESSAGE_HEAD.matcher(lastLine);
                         m.reset();
                         assert m.matches(): "Checked lastLine should be matched regex pattern";
@@ -161,6 +165,7 @@ public class Scanner extends Utf8LineInputStream implements Iterable<Message<Str
                             $extRef = String.valueOf("");
 
                         scannerInfo("Break; Scanning message body, " + $lastHeadType + "~" + $lastHead.toString() + ", E:" + $extRef);
+                        markSourceObject($lastHead);
                         state = ScannerState.SCAN_BODY;
 
                         /* fail through */
@@ -179,7 +184,7 @@ public class Scanner extends Utf8LineInputStream implements Iterable<Message<Str
                             matchTextPart(bareMatcher, $bareLinks, 1, 2);
                             matchTextPart(markdownMatcher, $links, 1, 2);
 
-                            bodyBuffer.append(line);
+                            bodyBuffer.append(line).append(System.lineSeparator());
                         });
                         keepLineOnce = true; // keep message head line
 
@@ -216,9 +221,29 @@ public class Scanner extends Utf8LineInputStream implements Iterable<Message<Str
 
                 ++messageNo;
                 localLine = 0;
+                markSourceObject(lastMessage);
                 return lastMessage;
             }
         };
+    }
+
+    /**
+     * Fetch current scanner source location
+     *
+     * @return current scanning location
+     */
+    public SourceLocation getCurrentSourceLocation() {
+        return new SourceLocation(offset, line, messageNo, localLine);
+    }
+
+    /**
+     * Mark source object to global {@link org.duangsuse.telegramscanner.sourcemanager.SourceManager}
+     *
+     * @see SourceManager#getInstance() instance pool
+     * @param sourceObj identifiable object to be added with current scanner position
+     */
+    public void markSourceObject(Identifiable sourceObj) {
+        SourceManager.getInstance().put(sourceObj, getCurrentSourceLocation());
     }
 
     /**
@@ -226,20 +251,36 @@ public class Scanner extends Utf8LineInputStream implements Iterable<Message<Str
      *
      * @param matcher text matcher
      * @param dst destination collection
+     * @param separator string join separator
      * @param groups to be collected (and concatenated)
      */
-    private void matchTextPart(@NotNull Matcher matcher, Collection<String> dst, int... groups) {
+    private void matchTextPart(@NotNull Matcher matcher, Collection<String> dst, String separator, int... groups) {
         //if (matcher.matches())
         //    for (int i = 1; i < matcher.groupCount(); i++)
         //        dst.add(matcher.group(i).trim());
 
         while (matcher.find()) {
             StringBuilder sb = new StringBuilder();
+
             for (int i: groups) {
-                sb.append(matcher.group(i));
+                sb.append(matcher.group(i)).append(separator);
             }
+
+            sb.delete(sb.length() - separator.length(), sb.length());
+
             dst.add(sb.toString());
         }
+    }
+
+    /**
+     * Match text part using {@link Matcher}, collecting groups, using "://" as separator
+     *
+     * @param matcher text matcher
+     * @param dst destination collection
+     * @param groups to be collected (and concatenated)
+     */
+    private void matchTextPart(@NotNull Matcher matcher, Collection<String> dst, int... groups) {
+        matchTextPart(matcher, dst, "://", groups);
     }
 
     /**

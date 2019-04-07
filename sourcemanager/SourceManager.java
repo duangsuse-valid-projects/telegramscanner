@@ -1,5 +1,7 @@
 package org.duangsuse.telegramscanner.sourcemanager;
 
+import org.jetbrains.annotations.Contract;
+
 import java.util.HashMap;
 
 /**
@@ -21,5 +23,6 @@ public class SourceManager extends SimpleMapDelegate<Identifiable, SourceLocatio
         static { INSTANCE = new SourceManager(); }
     }
 
-    public SourceManager getInstance() { return LazyHolder.INSTANCE; }
+    @Contract(pure = true)
+    public static SourceManager getInstance() { return LazyHolder.INSTANCE; }
 }
