@@ -17,7 +17,8 @@ public class SourceManager extends SimpleMapDelegate<Identifiable, SourceLocatio
      * Lazy source manager singleton instance
      */
     private static final class LazyHolder {
-        static final SourceManager INSTANCE = new SourceManager();
+        /** Initialized in &lt;clinit&gt; */static final SourceManager INSTANCE;
+        static { INSTANCE = new SourceManager(); }
     }
 
     public SourceManager getInstance() { return LazyHolder.INSTANCE; }

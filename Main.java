@@ -1,5 +1,8 @@
 package org.duangsuse.telegramscanner;
 
+import org.duangsuse.telegramscanner.scanner.Utf8LineInputStream;
+
+import java.io.IOException;
 import java.io.PrintStream;
 
 /**
@@ -33,5 +36,19 @@ public class Main {
      */
     public static void main(String... args) {
         err.print("TelegramScanner version "); err.println(VERSION);
+
+        Utf8LineInputStream input = new Utf8LineInputStream(System.in);
+        String line = "";
+
+        try {
+            do {
+                out.print(line);
+                out.println();
+                out.print("> ");
+            }
+            while ((line = input.readLine()) != null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

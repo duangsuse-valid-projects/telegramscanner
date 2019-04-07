@@ -28,7 +28,7 @@ public class SourceLocation {
     }
 
     public SourceLocation(int offset, int line, int messageNo, int messageLine) {
-        super();
+        super(); // ;)
         this.offset = offset;
         this.line = line;
         this.messageNo = messageNo;
@@ -75,10 +75,6 @@ public class SourceLocation {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("SourceLocation");
-        sb.append('(').append('@').append(offset).append('L').append(line)
-                .append(", Message#").append(messageNo).append(':').append(messageLine).append(')');
-
-        return sb.toString();
+        return String.format("SourceLocation(@%dL%d, Message#%d:%d)", offset, line, messageNo, messageLine);
     }
 }
