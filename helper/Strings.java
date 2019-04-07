@@ -1,5 +1,7 @@
 package org.duangsuse.telegramscanner.helper;
 
+import org.jetbrains.annotations.Contract;
+
 /**
  * String helper program
  */
@@ -11,8 +13,9 @@ public final class Strings {
      * @param str target string
      * @return if str.length greater than n, then sub-sequence str, else return str
      */
+    @Contract("_, null -> !null")
     public static String take(int n, String str) {
-        if (n == 0 || str.length() == 0)
+        if (str == null || n == 0 || str.length() == 0)
             return "";
 
         if (str.length() > n)

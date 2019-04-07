@@ -12,7 +12,7 @@ public enum MessageHeaderType {
     /**
      * Reply to message
      */
-    RELPY,
+    REPLY,
     /**
      * Forwarded message
      */

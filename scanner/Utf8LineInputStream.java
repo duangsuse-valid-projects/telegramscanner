@@ -1,5 +1,7 @@
 package org.duangsuse.telegramscanner.scanner;
 
+import org.jetbrains.annotations.Contract;
+
 import java.io.*;
 import java.nio.charset.Charset;
 
@@ -16,7 +18,7 @@ public class Utf8LineInputStream implements Closeable {
     private DataInput target;
 
     /**
-     * Construct using data input {@link DataInputStream}
+     * Construct using data input {@link DataInputStream}, no wrappers used
      *
      * @param dataIn data input instance
      */
@@ -25,7 +27,7 @@ public class Utf8LineInputStream implements Closeable {
     }
 
     /**
-     * Construct using byte input stream
+     * Construct using byte input stream, wrapped by UTF-8 reader
      *
      * @see InputStreamReader with utf-8 decoder support
      * @param in line-based input stream
@@ -42,6 +44,7 @@ public class Utf8LineInputStream implements Closeable {
         this.target = new DataInputStream(is);
     }
 
+    @Contract(value = "null -> false", pure = true)
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

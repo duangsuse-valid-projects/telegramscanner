@@ -1,9 +1,14 @@
 package org.duangsuse.telegramscanner;
 
+import org.duangsuse.telegramscanner.model.Message;
+import org.duangsuse.telegramscanner.scanner.Scanner;
 import org.duangsuse.telegramscanner.scanner.Utf8LineInputStream;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Arrays;
+
+import java.util.List;
 
 /**
  * Application main class
@@ -27,7 +32,7 @@ public class Main {
     /**
      * Standard input
      */
-    private static PrintStream err = System.err;
+    public static PrintStream err = System.err;
 
     /**
      * Program entrance
@@ -36,7 +41,18 @@ public class Main {
      */
     public static void main(String... args) {
         err.print("TelegramScanner version "); err.println(VERSION);
+        List<String> argList = Arrays.asList(args);
 
+        if (argList.contains("-test"))
+            testInput();
+
+        for (Message<String> stringMessage : new Scanner(System.in)) {
+            out.print(stringMessage.toString());
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public static void testInput() {
         Utf8LineInputStream input = new Utf8LineInputStream(System.in);
         String line = "";
 

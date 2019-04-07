@@ -1,6 +1,7 @@
 package org.duangsuse.telegramscanner.model;
 
 import org.duangsuse.telegramscanner.helper.Strings;
+import org.duangsuse.telegramscanner.sourcemanager.Identifiable;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -17,7 +18,7 @@ import java.util.LinkedList;
  *     <li>hashTags
  * </ul>
  */
-public class Message<T> {
+public class Message<T> implements Identifiable {
     private MessageHeaderType headerType = MessageHeaderType.NORMAL;
     /**
      * Message header (name, publishedAt)
@@ -47,15 +48,21 @@ public class Message<T> {
      */
     public Message() {}
 
+    public Message(MessageHead head, MessageHeaderType type, T extRef) {
+        this.header = head;
+        this.headerType = type;
+        this.messageExtRef = extRef;
+    }
+
     @Override
     public String toString() {
         // count links and hashtags
         final StringBuilder desc = new StringBuilder();
-        if (links.size() != 0) desc.append(links.size()).append(" links");
+        if (links.size() != 0) desc.append(links.size()).append(" links, ");
         if (hashtags.size() != 0) desc.append(hashtags.size()).append(" tags");
 
         final String fmt = "Message{Hd%s, Bd%s, ext=%s}[%s](%s..., %s)";
-        return String.format(fmt, headerType, bodyType, messageExtRef.toString(), header, Strings.take(BODY_PREVIEW_LEN, messageBody), desc);
+        return String.format(fmt, headerType, bodyType, messageExtRef.toString(), header.toString(), Strings.take(BODY_PREVIEW_LEN, messageBody), desc);
     }
 
     @Override
@@ -85,6 +92,11 @@ public class Message<T> {
         result = 31 * result + links.hashCode();
         result = 31 * result + hashtags.hashCode();
         return result;
+    }
+
+    @Override
+    public int getIdentity() {
+        return System.identityHashCode(this);
     }
 
     public MessageHeaderType getHeaderType() {
