@@ -71,6 +71,7 @@ public class Scanner extends Utf8LineInputStream implements Iterable<Message<Str
             @Override
             public Message<String> next() {
                 lastMessage = new Message<>();
+                ++messageNo;
 
                 String tgName = "";
                 Date published = null;
@@ -219,9 +220,8 @@ public class Scanner extends Utf8LineInputStream implements Iterable<Message<Str
                         break;
                 }
 
-                ++messageNo;
-                localLine = 0;
                 markSourceObject(lastMessage);
+                localLine = 0;
                 return lastMessage;
             }
         };

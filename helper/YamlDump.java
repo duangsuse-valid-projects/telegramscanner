@@ -66,6 +66,9 @@ public final class YamlDump {
             if (debugs.containsKey(m.getIdentity()))
                 yamlObject.put("debug", debugs.get(m.getIdentity()));
 
+            if (debugs.containsKey(m.getHeader().getIdentity()))
+                yamlObject.put("header_debug", debugs.get(m.getHeader().getIdentity()));
+
             listMsgs.add(yamlObject);
         }
         return listMsgs;
